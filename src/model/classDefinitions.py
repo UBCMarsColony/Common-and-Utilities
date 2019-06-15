@@ -2,9 +2,11 @@ class Sphere():
     """Sphere object represents a sphere of influence;
        may be a planet, spaceship, asteroid ,etc."""
 
-       def __init__(self, modSys):
+       def __init__(self, modSys, spatialVector, functionVector, timeStep):
            self.modSys = modSys
-
+           self.spatialVector = spatialVector
+           self.functionVector = functionVector
+           self.timeStep = timeStep
 
 class ModulatorSystem():
     """ModSys object is a graph or structured
