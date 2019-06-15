@@ -1,4 +1,4 @@
-# airlock-masters <img align="right" src="artwork/ubcmc-logo-transparent_small.png">
+# Sabatier Mission Architecture <img align="right" src="artwork/ubcmc-logo-transparent_small.png">
 UBC Mars Colony airlock repository. All source code, datasheets, and other materials related to the airlock are found here.
 
 ## Naming convention
