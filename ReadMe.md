@@ -12,9 +12,9 @@ All code, documentation, and other files related to the project follow a standar
 Separate the descrete name elements using underscores, and use hypens instead of spaces. (Although this may cause errors in importing, it is generally avoidable through a bit of fanagling - see the wiki for more details.)
 
 ### Folders
-Folders should be broken up into logical parts, to ensure code can be found as quickly as possible. Use hyphens instead of spaces in folder names. Additionally, avoid the use of capital letters in the folder names unless absolutely necessary. For instance, the path to a CO2 Sensor file may be:
+Folders should be broken up into logical parts, to ensure code can be found as quickly as possible. Use hyphens instead of spaces in folder names. Additionally, avoid the use of capital letters in the folder names unless absolutely necessary. For instance, the path to a parameters file may be:
 
-*airlock-masters/sensors/co2-sensor/co2file.py*
+*Sabatier-Missionm-Architecture/parameter/planetparamtry1.txt*
 
 ## Directories
 Directories are split up into logical chunks to be easily navigated. Descriptions of each directory are included below.
