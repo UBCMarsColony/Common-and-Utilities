@@ -1,5 +1,5 @@
 # Sabatier Mission Architecture <img align="right" src="artwork/ubcmc-logo-transparent_small.png">
-UBC Mars Colony airlock repository. All source code, datasheets, and other materials related to the airlock are found here.
+UBC Mars Colony Sabatier Mission Architecure repository. All source code, datasheets, and other materials relevant to the Sabatier Mission Architecure are located here.
 
 ## Naming convention
 To ensure the repository is quick to navigate, all Mars Colony files should follow a standardized naming convention. This naming convention extends to both files and folders, as outlined below:
@@ -9,12 +9,12 @@ All code, documentation, and other files related to the project follow a standar
 
 *Project-Module_Project-Part_Description(_Sample).extension*.
 
-Separate the descrete name elements using underscores, and use hypens instead of spaces. (Although this may cause errors in importing, it is generally avoidable through a bit of fanagling - see the wiki for more details.)
+Separate the descrete name elements using underscores, and use hypens instead of spaces. (Although this may cause errors in importing, it is generally avoidable - see the wiki for more details.)
 
 ### Folders
 Folders should be broken up into logical parts, to ensure code can be found as quickly as possible. Use hyphens instead of spaces in folder names. Additionally, avoid the use of capital letters in the folder names unless absolutely necessary. For instance, the path to a parameters file may be:
 
-*Sabatier-Missionm-Architecture/parameter/planetparamtry1.txt*
+*Sabatier-Mission-Architecture/parameter/planetparamtry1.txt*
 
 ## Directories
 Directories are split up into logical chunks to be easily navigated. Descriptions of each directory are included below.
@@ -29,37 +29,4 @@ Directories are split up into logical chunks to be easily navigated. Description
   Contains documentation, datasheets and more for hardware and software used in the project. </br>
 </details>
 
-<details>
-<summary><b>Failsafe</b></summary>
-  Contains the code used to process sensor data on the Arduino board and send it via I2C to the main Raspberry Pi system. </br>
-</details>
 
-<details>
-<summary><b>Lighting</b></summary>
-  Contains code and data about lighting systems in the airlock. </br>
-</details>
-
-<details>
-<summary><b>Motors</b></summary>
-  Contains code and data about the motors in the airlock. </br>
-</details>
-
-<details>
-<summary><b>Pi-Main</b></summary>
-   Contains the Raspberry Pi code for system setup and mainloop. </br>
-</details>
-
-<details>
-<summary><b>Pi-Systems</b></summary>
-   Contains code used by the Raspberry Pi to run services within the airlock. Such services may include pressurization, lighting and door management. </br>
-</details>
-
-<details>
-<summary><b>Sensors</b></summary>
-   Contains embedded systems code related to sensor functionality. </br>
-</details>
-
-<details>
-<summary><b>User Interface (UI)</b></summary>
-   Contains code and outlines of on-airlock user interface systems.</br>
-</details>
