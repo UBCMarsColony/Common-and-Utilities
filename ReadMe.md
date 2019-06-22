@@ -14,7 +14,7 @@ Separate the descrete name elements using underscores, and use hypens instead of
 ### Folders
 Folders should be broken up into logical parts, to ensure code can be found as quickly as possible. Use hyphens instead of spaces in folder names. Additionally, avoid the use of capital letters in the folder names unless absolutely necessary. For instance, the path to a parameters file may be:
 
-*Sabatier-Mission-Architecture/parameter/planetparamtry1.txt*
+*Sabatier-Mission-Architecture/parameter/planetparamtry
 
 ## Directories
 Directories are split up into logical chunks to be easily navigated. Descriptions of each directory are included below.
