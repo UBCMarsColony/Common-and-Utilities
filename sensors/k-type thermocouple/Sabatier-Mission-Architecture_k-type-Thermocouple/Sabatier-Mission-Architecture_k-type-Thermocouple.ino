@@ -4,7 +4,7 @@
 #include "max6675.h"
 
 int thermoDO = 11;            //SO pin on HW-550 board
-int thermoCS = 12;            //CS pin (PWM)
+int thermoCS = 12;            //CS pin
 int thermoCLK = 13;           //SCK pin (PWM)
 
 MAX6675 thermocouple(thermoCLK, thermoCS, thermoDO);      //Pin definitions
