@@ -2,6 +2,6 @@
     "port": "COM10",
     "programmer": "AVRISP mkII",
     "board": "arduino:avr:mega",
-    "configuration": "cpu=atmega2560",
-    "sketch": "heating tape\\heat_tape_PID_control\\heat_tape_PID_control.ino"
+    "sketch": "heating tape\\heat_tape_PID_control\\heat_tape_PID_control.ino",
+    "configuration": "cpu=atmega2560"
 }
