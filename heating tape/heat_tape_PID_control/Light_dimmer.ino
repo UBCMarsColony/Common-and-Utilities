@@ -35,10 +35,10 @@ MAX6675 thermocouple(thermoCLK, thermoCS, thermoDO);
 //Variables
 int last_CH1_state = 0;
 bool zero_cross_detected = false;
-int firing_delay = 7400;
+int firing_delay = 6000;
 
 //////////////////////////////////////////////////////
-int maximum_firing_delay = 7400;
+int maximum_firing_delay = 6000;
 /*Later in the code you will se that the maximum delay after the zero detection
    is 7400. Why? Well, we know that the 220V AC voltage has a frequency of around 50-60HZ so
    the period is between 20ms and 16ms, depending on the country. We control the firing
@@ -96,16 +96,16 @@ void loop() {
   if (currentMillis - previousMillis >= temp_read_Delay) {
     previousMillis += temp_read_Delay;              //Increase the previous time for next loop
     
-    PID_value = 74 * setpoint;                      //Calculate total PID value
+    PID_value = 60 * setpoint;                    //Calculate total PID value
 
     //We define firing delay range between 0 and 7400. Read above why 7400!!!!!!!
     if (PID_value < 0)
     {
       PID_value = 0;
     }
-    if (PID_value > 7400)
+    if (PID_value > 6000)
     {
-      PID_value = 7400;
+      PID_value = 6000;
     }
     //Printe the values on the LCD
     lcd.clear();
@@ -113,6 +113,10 @@ void loop() {
     lcd.print("Set: ");
     lcd.setCursor(5, 0);
     lcd.print(setpoint);
+    lcd.setCursor(0, 1);
+    lcd.print("PID_Value: ");
+    lcd.setCursor(11, 1);
+    lcd.print(PID_value);
   }
 
   //If the zero cross interruption was detected we create the 100us firing pulse
@@ -120,6 +124,7 @@ void loop() {
   {
     delayMicroseconds(maximum_firing_delay - PID_value); //This delay controls the power
     digitalWrite(firing_pin, HIGH);
+    Serial.println("firing high");
     delayMicroseconds(100);
     digitalWrite(firing_pin, LOW);
     zero_cross_detected = false;
@@ -143,13 +148,14 @@ ISR(PCINT0_vect) {
   if (PINB & B00000001) {          //We make an AND with the state register, We verify if pin D8 is HIGH???
     if (last_CH1_state == 0) {     //If the last state was 0, then we have a state change...
       zero_cross_detected = true;  //We have detected a state change! We need both falling and rising edges
+      Serial.println("cross detected");
     }
   }
   else if (last_CH1_state == 1) {  //If pin 8 is LOW and the last state was HIGH then we have a state change
     zero_cross_detected = true;    //We have detected a state change!  We need both falling and rising edges.
     last_CH1_state = 0;            //Store the current state into the last state for the next loop
   }
-
+  Serial.println("interrupt detected");
   if (switchBool) {
     aVal = digitalRead(increase_pin);
     if (aVal != pinALast) { //Means the knob is rotating
