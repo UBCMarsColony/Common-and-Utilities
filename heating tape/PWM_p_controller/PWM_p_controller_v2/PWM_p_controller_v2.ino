@@ -66,15 +66,24 @@ const int LCD_display_Delay = 300;
 unsigned long previousMillis = 0;
 unsigned long previousMillis2 = 0;
 unsigned long currentMillis = 0;
-int real_temperature = 0; 
-int previous_temperature = 0;
+float real_temperature = 0; 
+float previous_temperature = 0;
 
 //Controller Variable Declear
-int setpoint = 50;  //desired temputure
-int k = 7;          //P
-float PWM = 0;
-int Error=0;        //Timer 1 comparetor value, used to control the power of output or AC circuit
-int Output = 440;   //0 is the highest, 440 is set to be the default lowest, 450 could cause unpredicted pulse, need to recheck
+float setpoint = 50;  //desired temputure
+//int k = 7;          //P
+//float PWM = 0;
+float Error = 0;      //Timer 1 comparetor value, used to control the power of output or AC circuit
+float previous_error = 0;
+int Output = 440;     //0 is the highest, 440 is set to be the default lowest, 450 could cause unpredicted pulse, need to recheck
+
+float PID_p = 0;
+float PID_i = 0;
+float PID_d = 0;
+float kp = 7;
+float ki = 0.1;
+float kd = 0;
+float PID = 0;
 
 //Start a MAX6675 communication with the selected pins
 MAX6675 thermocouple(thermoCLK, thermoCS, thermoDO);
@@ -124,17 +133,6 @@ ISR(TIMER1_OVF_vect){ //timer1 overflow
   TCCR1B = 0x00;          //disable timer stopd unintended triggers
 }
 
-void LCD_display(){
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Set: ");
-    lcd.setCursor(5, 0);
-    lcd.print(setpoint);
-    lcd.setCursor(0, 1);
-    lcd.print("Real temp: ");
-    lcd.setCursor(11, 1);
-    lcd.print(real_temperature);  
-}
 
 
 
@@ -153,16 +151,24 @@ void loop(){
 
   //Controller test********************************************************************************************************************************************
   setpoint = i;
+  previous_error = Error;
   Error = setpoint - real_temperature;
-  PWM = k*Error+30;
-  if(PWM>100){
-    PWM=100;
+
+  PID_p = kp * Error;                                                         //Calculate the P value
+  PID_i = PID_i + (ki * Error);                                               //Calculate the I value
+  PID_d = kd * ((Error - previous_error) / (temp_read_Delay / 1000.0));       //Calculate the D value
+  PID = PID_p + PID_i + PID_d;                                                //Calculate total PID value
+  
+  //PWM = k*Error+30;
+  
+  if(PID>100){
+    PID=100;
   }
-  if(PWM<0){
-    PWM=0;    
+  if(PID<0){
+    PID=0;    
   }
-  PWM=PWM/100;
-  Output = 440-(440*PWM);
+  PID=PID/100;
+  Output = 440-(440*PID);
   if(Output>440){
     Output=440;
   }
@@ -174,7 +180,16 @@ void loop(){
 
   //LCD_display*************************************************************************************************************************************************
   if ( millis()-previousMillis2 >= LCD_display_Delay){
-    LCD_display;
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Set: ");
+    lcd.setCursor(5, 0);
+    lcd.print(setpoint);
+    lcd.setCursor(0, 1);
+    lcd.print("Real temp: ");
+    lcd.setCursor(11, 1);
+    lcd.print(real_temperature, 2);
+    Serial.println(real_temperature);
     previousMillis2 = millis();
   }
 
