@@ -24,7 +24,7 @@ MAX6675 thermocouple3(thermoCLK1, thermoCS3, thermoDO3);      //Common clock for
 
 void setup() {
   Serial.begin(9600);
-  // use Arduino pins 
+  //Use Arduino pins 
   //Using vcc pin on board, no need to set a pin high
   //Using ground pin on board, no need to set a pin low
 
