@@ -5,8 +5,10 @@
 //Define variables
 float actualtemp_ext = 0;
 float actualtemp_int = 0;
+float actualtemp_int3 = 0;
 float thermocouple1_offset = 0; //+0 deg. C offset
 float thermocouple2_offset = 0; //+0 deg. C offset
+float thermocouple3_offset = 0; //+0 deg. C offset
 float templimit_ext = 500;
 float templimit_int = 400;
 
@@ -32,8 +34,17 @@ int thermoCLK2 = 26;           // SCK pin (PWM)
 int vccPin2 = 24;              // choose pin for vcc
 int gndPin2 = 22;              // choose pin for gnd
 
+//Thermocouple 3 Pin Definitions
+int thermoDO3 = 3;            // SO pin on HW-550 board
+int thermoCS3 = 4;            // CS pin (PWM)
+int thermoCLK3 = 5;           // SCK pin (PWM)
+int vccPin3 = 6;              // choose pin for vcc
+int gndPin3 = 7;              // choose pin for gnd
+
+
 MAX6675 thermocouple1(thermoCLK1, thermoCS1, thermoDO1);      //defining MAX6675
 MAX6675 thermocouple2(thermoCLK2, thermoCS2, thermoDO2);      //defining MAX6675
+MAX6675 thermocouple2(thermoCLK3, thermoCS3, thermoDO3);      //defining MAX6675
 
 void setup() {
   Serial.begin(9600);
@@ -73,7 +84,9 @@ void loop() {
   {
     actualtemp_int = (thermocouple2.readCelsius()) - thermocouple2_offset;
     Serial.print("\n Internal Temp C = ");
-    Serial.println(actualtemp_int);
+    actualtemp_int2 = (thermocouple3.readCelsius()) - thermocouple3_offset;
+    Serial.print("\n Internal Temp2 C = ");
+    Serial.println(actualtemp_int2);
     if (actualtemp_int < templimit_int) //Temperature Comparison
     {
     digitalWrite(relaytrigger,HIGH);           // Turns ON Relay
@@ -89,6 +102,9 @@ void loop() {
   {
     actualtemp_int = (thermocouple2.readCelsius()) - thermocouple2_offset;
     Serial.print("\n Internal Temp C = ");
+    actualtemp_int2 = (thermocouple3.readCelsius()) - thermocouple3_offset;
+    Serial.print("\n Internal Temp2 C = ");
+    Serial.println(actualtemp_int2);
     Serial.println(actualtemp_int);
     digitalWrite(relaytrigger,LOW);           // Turns OFF Relay
     Serial.println("\n Relay open");
