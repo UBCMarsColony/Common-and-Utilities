@@ -1,5 +1,3 @@
-// Basic code to test the pressure transducer at high temp.
-
 #include "max6675.h"
 
 //Define variables
@@ -13,33 +11,33 @@ float templimit_ext = 500;
 float templimit_int = 400;
 
 // Pressure transducer pins
-const int analogPin = A0; // input connected to analog pin 0
+const int analogPin = A5; // input connected to analog pin 0
 float inPin;        // variable to store the read value
 float val = 0;      // variable to store the read value
 
 //Relay Pin Definitions
-int relaytrigger = 11;
+int relaytrigger = 2;
 
 //Thermocouple 1 Pin Definitions
-int thermoDO1 = 3;            // SO pin on HW-550 board
-int thermoCS1 = 4;            // CS pin (PWM)
+int thermoDO1 = 6;            // SO pin on HW-550 board
+int thermoCS1 = 8;            // CS pin (PWM)
 int thermoCLK1 = 5;           // SCK pin (PWM)
-int vccPin1 = 6;              // choose pin for vcc
-int gndPin1 = 7;              // choose pin for gnd
+//int vccPin1 = 6;              // choose pin for vcc
+//int gndPin1 = 7;              // choose pin for gnd
 
 //Thermocouple 2 Pin Definitions
-int thermoDO2 = 30;            // SO pin on HW-550 board
-int thermoCS2 = 28;            // CS pin (PWM)
-int thermoCLK2 = 26;           // SCK pin (PWM)
-int vccPin2 = 24;              // choose pin for vcc
-int gndPin2 = 22;              // choose pin for gnd
+int thermoDO2 = 6;            // SO pin on HW-550 board
+int thermoCS2 = 9;            // CS pin (PWM)
+int thermoCLK2 = 5;           // SCK pin (PWM)
+////int vccPin2 = 24;              // choose pin for vcc
+////int gndPin2 = 22;              // choose pin for gnd
 
 //Thermocouple 3 Pin Definitions
-int thermoDO3 = 3;            // SO pin on HW-550 board
-int thermoCS3 = 4;            // CS pin (PWM)
+int thermoDO3 = 6;            // SO pin on HW-550 board
+int thermoCS3 = 10;            // CS pin (PWM)
 int thermoCLK3 = 5;           // SCK pin (PWM)
-int vccPin3 = 6;              // choose pin for vcc
-int gndPin3 = 7;              // choose pin for gnd
+//int vccPin3 = 6;              // choose pin for vcc
+//int gndPin3 = 7;              // choose pin for gnd
 
 
 MAX6675 thermocouple1(thermoCLK1, thermoCS1, thermoDO1);      //defining MAX6675
@@ -53,12 +51,12 @@ void setup() {
   pinMode(relaytrigger, OUTPUT);  
 
   // For thermocouple 1
-  pinMode(vccPin1, OUTPUT); digitalWrite(vccPin1, HIGH); //set pin as a 5V vcc
-  pinMode(gndPin1, OUTPUT); digitalWrite(gndPin1, LOW);  //set pin as a gnd
+//  pinMode(vccPin1, OUTPUT); digitalWrite(vccPin1, HIGH); //set pin as a 5V vcc
+//  pinMode(gndPin1, OUTPUT); digitalWrite(gndPin1, LOW);  //set pin as a gnd
   
   // For thermocouple 2
-  pinMode(vccPin2, OUTPUT); digitalWrite(vccPin2, HIGH); //set pin as a 5V vcc
-  pinMode(gndPin2, OUTPUT); digitalWrite(gndPin2, LOW);  //set pin as a gnd
+//  pinMode(vccPin2, OUTPUT); digitalWrite(vccPin2, HIGH); //set pin as a 5V vcc
+//  pinMode(gndPin2, OUTPUT); digitalWrite(gndPin2, LOW);  //set pin as a gnd
 
   // wait for MAX chip to stabilize
   delay(500);
@@ -66,7 +64,7 @@ void setup() {
 }
 
 void loop() {
-  inPin = analogRead(A0);   // read the input pin
+  inPin = analogRead(analogPin);   // read the input pin
   val = (((inPin - 101)*30)/(922-101));
   /* 
   1024 bits for arduino input, multiplication factor is 30 as transducer reads 0 to 30 PSI
@@ -76,6 +74,7 @@ void loop() {
   */
   Serial.print("\n Pressure Value (PSI) = "); 
   Serial.println(val);
+  Serial.print("\t");
 
   actualtemp_ext = (thermocouple1.readCelsius()) - thermocouple1_offset;
   Serial.print("\n External Temp C = ");
@@ -84,6 +83,8 @@ void loop() {
   {
     actualtemp_int = (thermocouple2.readCelsius()) - thermocouple2_offset;
     Serial.print("\n Internal Temp C = ");
+    Serial.println(actualtemp_int);
+    Serial.print("\t");
     actualtemp_int2 = (thermocouple3.readCelsius()) - thermocouple3_offset;
     Serial.print("\n Internal Temp2 C = ");
     Serial.println(actualtemp_int2);
@@ -91,11 +92,13 @@ void loop() {
     {
     digitalWrite(relaytrigger,HIGH);           // Turns ON Relay
     Serial.println("\n Relay closed");
+    Serial.print("\t");
     }
     else
     {
     digitalWrite(relaytrigger,LOW);           // Turns OFF Relay
     Serial.println("\n Relay open");
+    Serial.print("\t");
     }
   }
   else
@@ -104,10 +107,15 @@ void loop() {
     Serial.print("\n Internal Temp C = ");
     actualtemp_int2 = (thermocouple3.readCelsius()) - thermocouple3_offset;
     Serial.print("\n Internal Temp2 C = ");
-    Serial.println(actualtemp_int2);
     Serial.println(actualtemp_int);
+    Serial.print("\t");
+    Serial.println(actualtemp_int2);
     digitalWrite(relaytrigger,LOW);           // Turns OFF Relay
     Serial.println("\n Relay open");
+    Serial.print("\t");
   }
-  delay(100);
+  Serial.print("Time: ");
+  time = millis();
+  Serial.println(time);
+  delay(100)
 }
