@@ -5,7 +5,7 @@
 //Define variables
 float actualtemp_ext = 0;
 float actualtemp_int = 0;
-float actualtemp_int3 = 0;
+float actualtemp_int2 = 0;
 float thermocouple1_offset = 0; //+0 deg. C offset
 float thermocouple2_offset = 0; //+0 deg. C offset
 float thermocouple3_offset = 0; //+0 deg. C offset
