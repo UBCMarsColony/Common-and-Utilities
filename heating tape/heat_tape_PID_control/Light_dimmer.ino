@@ -95,8 +95,22 @@ void loop() {
       PID control. I've tried reading the temp each 100ms but it didn't work. With 500ms worked ok.*/
   if (currentMillis - previousMillis >= temp_read_Delay) {
     previousMillis += temp_read_Delay;              //Increase the previous time for next loop
+      real_temperature = thermocouple.readCelsius();  //get the real temperature in Celsius degrees
+
+    PID_error = setpoint - real_temperature;        //Calculate the pid ERROR
     
-    PID_value = 60 * setpoint;                    //Calculate total PID value
+    if(PID_error > 30)                              //integral constant will only affect errors below 30ºC             
+    {PID_i = 0;}
+    
+    PID_p = kp * PID_error;                         //Calculate the P value
+    PID_i = PID_i + (ki * PID_error);               //Calculate the I value
+    timePrev = Time;                    // the previous time is stored before the actual time read
+    Time = millis();                    // actual time read
+    elapsedTime = (Time - timePrev) / 1000;   
+    PID_d = kd*((PID_error - previous_error)/elapsedTime);  //Calculate the D value
+    PID_value = PID_p + PID_i + PID_d;                      //Calculate total PID value
+
+   
 
     //We define firing delay range between 0 and 7400. Read above why 7400!!!!!!!
     if (PID_value < 0)

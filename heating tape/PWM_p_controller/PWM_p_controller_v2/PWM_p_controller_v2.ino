@@ -1,10 +1,10 @@
 // AC Controllor
 //
-// This Arduino sketch is for use with the heater 
-// control circuit board which includes a zero 
+// This Arduino sketch is for use with the heater
+// control circuit board which includes a zero
 // crossing detect function and an opto-isolated TRIAC.
 //
-// AC Phase control is accomplished using the internal 
+// AC Phase control is accomplished using the internal
 // hardware timer1 in the Arduino
 //
 // Timing Sequence
@@ -21,7 +21,7 @@
 
 
 // The hardware timer runs at 16MHz. Using a
-// divide by 256 on the counter each count is 
+// divide by 256 on the counter each count is
 // 16 microseconds.  1/2 wave of a 60Hz AC signal
 // is about 520 counts (8,333 microseconds).
 
@@ -56,17 +56,17 @@ LiquidCrystal_I2C lcd(0x27, 16, 2); //sometimes the adress is not 0x27. Change t
 
 //Switch variables for knob
 int pinALast;    //pin A last poistion
-int aVal; 
+int aVal;
 bool switchBool; // state boolean for knob
-int i=50;        // used to adjust setpoint
+int i = 50;      // used to adjust setpoint
 
 //Other variables for main loop;
 const int temp_read_Delay = 200;
-const int LCD_display_Delay = 300; 
+const int LCD_display_Delay = 300;
 unsigned long previousMillis = 0;
 unsigned long previousMillis2 = 0;
 unsigned long currentMillis = 0;
-float real_temperature = 0; 
+float real_temperature = 0;
 float previous_temperature = 0;
 
 //Controller Variable Declear
@@ -81,69 +81,69 @@ float PID_p = 0;
 float PID_i = 0;
 float PID_d = 0;
 float kp = 7;
-float ki = 0.1;
+float ki = 1.5;
 float kd = 0;
 float PID = 0;
 
 //Start a MAX6675 communication with the selected pins
 MAX6675 thermocouple(thermoCLK, thermoCS, thermoDO);
 
-void setup(){
+void setup() {
 
   // set up pins
   pinMode(DETECT, INPUT);     //zero cross detect
   digitalWrite(DETECT, HIGH); //enable pull-up resistor
   pinMode(GATE, OUTPUT);      //TRIAC gate control
 
-  // set up Timer1 
+  // set up Timer1
   //(see ATMEGA 328 data sheet pg 134 for more details)
   OCR1A = 100;      //initialize the comparator
   TIMSK1 = 0x03;    //enable comparator A and overflow interrupts
   TCCR1A = 0x00;    //timer control registers set for
   TCCR1B = 0x00;    //normal operation, timer disabled
-  
+
   lcd.init();       //Start the LC communication
   lcd.backlight();  //Turn on backlight for LCD
-  
+
   Serial.begin(9600);
 
   // set up zero crossing interrupt
-  attachInterrupt(0,zeroCrossingInterrupt, RISING);    
-    //IRQ0 is pin 2. Call zeroCrossingInterrupt 
-    //on rising signal
+  attachInterrupt(0, zeroCrossingInterrupt, RISING);
+  //IRQ0 is pin 2. Call zeroCrossingInterrupt
+  //on rising signal
 
   pinALast = digitalRead(Increment);  //read initial position for increase_pin
   switchBool = false;
-}  
+}
 
 //Interrupt Service Routines
 
-void zeroCrossingInterrupt(){ //zero cross detect   
-  TCCR1B=0x04; //start timer with divide by 256 input
+void zeroCrossingInterrupt() { //zero cross detect
+  TCCR1B = 0x04; //start timer with divide by 256 input
   TCNT1 = 0;   //reset timer - count from zero
 }
 
-ISR(TIMER1_COMPA_vect){ //comparator match
-  digitalWrite(GATE,HIGH);  //set TRIAC gate to high
-  TCNT1 = 65536-PULSE;      //trigger pulse width
+ISR(TIMER1_COMPA_vect) { //comparator match
+  digitalWrite(GATE, HIGH); //set TRIAC gate to high
+  TCNT1 = 65536 - PULSE;    //trigger pulse width
 }
 
-ISR(TIMER1_OVF_vect){ //timer1 overflow
-  digitalWrite(GATE,LOW); //turn off TRIAC gate
+ISR(TIMER1_OVF_vect) { //timer1 overflow
+  digitalWrite(GATE, LOW); //turn off TRIAC gate
   TCCR1B = 0x00;          //disable timer stopd unintended triggers
 }
 
 
 
 
-void loop(){
+void loop() {
   /*  We create this if so we will read the temperature and change values each "temp_read_Delay"
       value. Change that value above iv you want. The MAX6675 read is slow. Tha will affect the
       PID control. I've tried reading the temp each 100ms but it didn't work. With 500ms worked ok.*/
-  
+
   //Thermocouple Reading*************************************************************************************************************************************
   if (millis() - previousMillis >= temp_read_Delay) {
-    previous_temperature = real_temperature; 
+    previous_temperature = real_temperature;
     real_temperature = thermocouple.readCelsius();  //get the real temperature in Celsius degrees
     previousMillis = millis();
   }
@@ -157,29 +157,44 @@ void loop(){
   PID_p = kp * Error;                                                         //Calculate the P value
   PID_i = PID_i + (ki * Error);                                               //Calculate the I value
   PID_d = kd * ((Error - previous_error) / (temp_read_Delay / 1000.0));       //Calculate the D value
+
+  if (PID_i + PID_d + PID_p > 100) {                                          //Prevent PID_i from going above 100, this prevents overshoot.
+    if (Error > 0)
+      PID_i = PID_i - (ki * Error);
+  }
+
+  if (PID_i + PID_d + PID_p < 0) {                                            //Prevent PID_i from going below 0, this prevents undershoot. 
+    if (Error < 0)
+      PID_i = PID_i - (ki * Error);
+  }
+
   PID = PID_p + PID_i + PID_d;                                                //Calculate total PID value
-  
+ // Serial.print(PID_i);
+ // Serial.print("  ");
+ // Serial.println(PID);
+
   //PWM = k*Error+30;
-  
-  if(PID>100){
-    PID=100;
+
+  if (PID > 100) {
+    PID = 100;
   }
-  if(PID<0){
-    PID=0;    
+
+  if (PID < 0) {
+    PID = 0;
   }
-  PID=PID/100;
-  Output = 440-(440*PID);
-  if(Output>440){
-    Output=440;
+  PID = PID / 100;
+  Output = 440 - (440 * PID);
+  if (Output > 440) {
+    Output = 440;
   }
-  if(Output<1){
-    Output=1;    
+  if (Output < 1) {
+    Output = 1;
   }
   OCR1A = Output;
 
 
   //LCD_display*************************************************************************************************************************************************
-  if ( millis()-previousMillis2 >= LCD_display_Delay){
+  if ( millis() - previousMillis2 >= LCD_display_Delay) {
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Set: ");
@@ -189,7 +204,6 @@ void loop(){
     lcd.print("Real temp: ");
     lcd.setCursor(11, 1);
     lcd.print(real_temperature, 2);
-    Serial.println(real_temperature);
     previousMillis2 = millis();
   }
 
@@ -201,11 +215,15 @@ void loop(){
       //If the knob is rotating, we need to determine direction
       //We do that by reading decrease_pin
       if (digitalRead(Decrement) != aVal) {  //Means increase changed first - We're Rotating Clockwise
-        if(i<440)
-        {i++;}
+        if (i < 440)
+        {
+          i++;
+        }
       } else {  //Otherwise decrease changed first and we're moving CCW
-        if(i>6)
-        {i--;}
+        if (i > 6)
+        {
+          i--;
+        }
       }
     }
     pinALast = aVal;
@@ -219,6 +237,6 @@ void loop(){
   else if (!switchBool & digitalRead(KnobSwitch) == LOW) {
     switchBool = true;
   }
-  while(digitalRead(KnobSwitch) == LOW) {}
-  
+  while (digitalRead(KnobSwitch) == LOW) {}
+
 }//end of main loop

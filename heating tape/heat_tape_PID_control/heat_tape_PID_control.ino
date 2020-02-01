@@ -151,7 +151,9 @@ int PID_value = 0;
 //PID constants
 int kp = 203;   int ki= 7.2;   int kd = 1.04;
 int PID_p = 0;    int PID_i = 0;    int PID_d = 0;
-
+//original values 
+//int kp = 203;   int ki= 7.2;   int kd = 1.04;
+//int PID_p = 0;    int PID_i = 0;    int PID_d = 0;
 
 
 
@@ -279,18 +281,3 @@ ISR(PCINT0_vect){
     }
 }
 //End of interruption vector for pins on port B: D8-D13
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
