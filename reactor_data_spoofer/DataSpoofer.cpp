@@ -8,12 +8,11 @@
 #include "./ReactorLocaleIDs.h"  // NUM_XXXX_LOCALES
 #include "./RSIProtocol.h"
 
-
 const float
 	MAX_TEMP = 400,  // Celsius
 	MAX_PRES = 200,  // kiloPascals
-	MAX_MASS = 100,  // kg
-	MAX_FLOW = 2;    // kg/s
+	MAX_MASS = 100,  // g
+	MAX_FLOW = 2.0;    // L/s
 
 float temperature[NUM_TEMP_LOCALES],
       flowrate[NUM_FLOW_LOCALES],
@@ -40,14 +39,15 @@ void spoof_temperature(uint8_t *buffer, uint8_t length)
 	for (int i = 0; i < NUM_TEMP_LOCALES; i++)
 	{
 		// BEHAVIOUR: Plateau to some temperature
-		float dTdt = (MAX_TEMP*((i + 1 / NUM_TEMP_LOCALES)) - temperature[i])  //...
+		float dTdt = (MAX_TEMP*((i * 1.0 / NUM_TEMP_LOCALES)) - temperature[i])  //...
 				* 1.0E-2;  // Modify this to change response speed
 		temperature[i] += dTdt * dt;
 
 		// Populate the array
 		frames[i].temperature_id = i + 1;
 		frames[i].timestamp      = millis();
-		frames[i].temperature    = temperature[i];
+		float noise = rand() % 100 / 100.0 - 0.5;  // Up to half a Ceslius
+		frames[i].temperature    = temperature[i] + noise;
 	}
 }
 
@@ -71,7 +71,8 @@ void spoof_flowrate(uint8_t *buffer, uint8_t length)
 		// Populate the array
 		frames[i].flowrate_id = i + 1;
 		frames[i].timestamp   = millis();
-		frames[i].flow_rate   = flowrate[i];
+		float noise = rand() % 100 / 500.0 - .1;  // +- 0.1 L/s
+		frames[i].flow_rate   = flowrate[i] + noise;
 	}
 }
 
@@ -95,7 +96,8 @@ void spoof_scale(uint8_t *buffer, uint8_t length)
 		// Populate the array
 		frames[i].scale_id  = i + 1;
 		frames[i].timestamp = millis();
-		frames[i].mass      = scale[i];
+		float noise = rand() % 100 / 5000.0 - 0.01;  // Up to 0.01 grams
+		frames[i].mass      = scale[i] + noise;
 	}
 }
 
